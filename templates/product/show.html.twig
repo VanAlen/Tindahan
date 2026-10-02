@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block body %}
+    <div class="masthead">
+        <h1>{{ product.name }}</h1>
+        <a class="button" href="{{ path('app_product_edit', {'id': product.id}) }}">Edit</a>
+    </div>
+
+    <div class="card">
+        <table>
+            <tbody>
+                <tr>
+                    <th style="width:140px; color:var(--ink-soft); font-weight:600;">ID</th>
+                    <td>{{ product.id }}</td>
+                </tr>
+
+                <tr>
+                    <th style="color:var(--ink-soft); font-weight:600;">Name</th>
+                    <td>{{ product.name }}</td>
+                </tr>
+
+                <tr>
+                    <th style="color:var(--ink-soft); font-weight:600;">Price</th>
+                    <td>₱{{ product.price|number_format(2, '.', ',') }}</td>
+                </tr>
+
+                <tr>
+                    <th style="color:var

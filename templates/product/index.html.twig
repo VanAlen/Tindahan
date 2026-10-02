@@ -1,0 +1,139 @@
+{% extends 'base.html.twig' %}
+{% block title %}Products{% endblock %}
+
+{% block body %}
+
+<div class="masthead">
+    <div>
+        <h1>Products</h1>
+        <span class="count" id="visibleCount">{{ products|length }} items</span>
+    </div>
+    <a class="button" href="{{ path('app_product_new') }}">+ Add product</a>
+</div>
+
+{# ── Filters ── #}
+<div class="filters">
+    <input
+        type="search"
+        id="filterName"
+        placeholder="Search by name…"
+        oninput="applyFilters()"
+    >
+
+    <select id="filterCategory" onchange="applyFilters()">
+        <option value="">All categories</option>
+        {% for cat in categories %}
+            <option value="{{ cat }}">{{ cat }}</option>
+        {% endfor %}
+    </select>
+
+    <select id="filterStock" onchange="applyFilters()">
+        <option value="">All stock levels</option>
+        <option value="out">Out of stock</option>
+        <option value="low">Low (1–5)</option>
+        <option value="ok">In stock (6+)</option>
+    </select>
+
+    <button class="btn-reset" onclick="resetFilters()">Clear</button>
+</div>
+
+{# ── Table ── #}
+<div class="card">
+    {% if products is empty %}
+        <div class="empty">
+            <p>No products yet. Add the first one!</p>
+            <a class="button" href="{{ path('app_product_new') }}">+ Add product</a>
+        </div>
+    {% else %}
+        <table id="productTable">
+            <thead>
+                <tr>
+                    <th class="col-id">#</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th class="col-num">Price</th>
+                    <th class="col-num">Stock</th>
+                    <th class="col-actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr
+                    data-name="{{ product.name|lower }}"
+                    data-category="{{ product.category|default('')|lower }}"
+                    data-stock="{{ product.stock }}"
+                >
+                    <td class="col-id">{{ product.id }}</td>
+                    <td>{{ product.name }}</td>
+                    <td>
+                        {% if product.category %}
+                            <span class="badge">{{ product.category }}</span>
+                        {% else %}
+                            <span class="muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="col-num">₱{{ product.price|number_format(2, '.', ',') }}</td>
+                    <td class="col-num">
+                        {% if product.stock == 0 %}
+                            <span class="stock-badge out">Out</span>
+                        {% elseif product.stock <= 5 %}
+                            <span class="stock-badge low">{{ product.stock }}</span>
+                        {% else %}
+                            <span class="stock-badge ok">{{ product.stock }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="col-actions">
+                        <a href="{{ path('app_product_show', {'id': product.id}) }}">View</a>
+                        <a href="{{ path('app_product_edit', {'id': product.id}) }}">Edit</a>
+                        <form method="post" action="{{ path('app_product_delete', {'id': product.id}) }}" onsubmit="return confirm('Delete {{ product.name }}?')">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="no-results" id="noResults" style="display:none">
+            No products match your filters.
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function applyFilters() {
+    const name     = document.getElementById('filterName').value.toLowerCase();
+    const category = document.getElementById('filterCategory').value.toLowerCase();
+    const stock    = document.getElementById('filterStock').value;
+    const rows     = document.querySelectorAll('#productTable tbody tr');
+    let visible    = 0;
+
+    rows.forEach(row => {
+        const matchName     = row.dataset.name.includes(name);
+        const matchCategory = !category || row.dataset.category === category;
+        const stockVal      = parseInt(row.dataset.stock);
+        const matchStock    =
+            !stock ||
+            (stock === 'out' && stockVal === 0) ||
+            (stock === 'low' && stockVal >= 1 && stockVal <= 5) ||
+            (stock === 'ok'  && stockVal >= 6);
+
+        const show = matchName && matchCategory && matchStock;
+        row.style.display = show ? '' : 'none';
+        if (show) visible++;
+    });
+
+    document.getElementById('visibleCount').textContent =
+        visible + (visible === 1 ? ' item' : ' items');
+    document.getElementById('noResults').style.display =
+        visible === 0 ? 'block' : 'none';
+}
+
+function resetFilters() {
+    document.getElementById('filterName').value     = '';
+    document.getElementById('filterCategory').value = '';
+    document.getElementById('filterStock').value    = '';
+    applyFilters();
+}
+</script>
+{% endblock %}

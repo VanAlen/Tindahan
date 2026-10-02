@@ -5,6 +5,158 @@
         <title>{% block title %}Welcome!{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
         {% block stylesheets %}
+        <style>
+            :root {
+                --ink: #1b1d1a;
+                --ink-soft: #5d635c;
+                --line: #e2e5df;
+                --paper: #ffffff;
+                --shelf: #f4f6f2;
+                --accent: #1f6f4a;
+                --accent-ink: #14512f;
+            }
+
+            * { box-sizing: border-box; }
+
+            body {
+                margin: 0;
+                background: var(--shelf);
+                color: var(--ink);
+                font-family: "Segoe UI", Roboto, -apple-system, sans-serif;
+                font-size: 16px;
+                line-height: 1.5;
+            }
+
+            .page { max-width: 960px; margin: 0 auto; padding: 24px 16px 64px; }
+
+            .masthead {
+                display: flex;
+                align-items: baseline;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+            .masthead h1 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+            .count { color: var(--ink-soft); font-size: 0.9rem; }
+
+            .filters {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-bottom: 14px;
+            }
+            .filters input, .filters select {
+                padding: 8px 12px;
+                border: 1px solid var(--line);
+                border-radius: 7px;
+                background: var(--paper);
+                font-size: 0.95rem;
+                color: var(--ink);
+                flex: 1 1 160px;
+            }
+            .filters input:focus, .filters select:focus {
+                outline: 2px solid var(--accent);
+                outline-offset: 1px;
+            }
+            .btn-reset {
+                padding: 8px 14px;
+                border: 1px solid var(--line);
+                border-radius: 7px;
+                background: var(--paper);
+                color: var(--ink-soft);
+                cursor: pointer;
+                font-size: 0.95rem;
+            }
+            .btn-reset:hover { background: var(--shelf); }
+
+            .card {
+                background: var(--paper);
+                border: 1px solid var(--line);
+                border-radius: 10px;
+                overflow: hidden;
+            }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { padding: 13px 14px; text-align: left; border-bottom: 1px solid var(--line); }
+            thead th { font-size: 0.82rem; font-weight: 600; color: var(--ink-soft); background: var(--shelf); }
+            tbody tr:last-child td { border-bottom: none; }
+            tbody tr:hover { background: #f9fbf8; }
+
+            .col-id { color: var(--ink-soft); width: 1%; white-space: nowrap; }
+            .col-num { text-align: right; font-variant-numeric: tabular-nums; }
+            .col-actions { white-space: nowrap; text-align: right; }
+
+            .badge {
+                display: inline-block;
+                background: #e8f0e9;
+                color: var(--accent-ink);
+                font-size: 0.8rem;
+                padding: 2px 8px;
+                border-radius: 99px;
+            }
+            .muted { color: var(--ink-soft); }
+
+            .stock-badge {
+                display: inline-block;
+                font-size: 0.8rem;
+                font-weight: 600;
+                padding: 2px 8px;
+                border-radius: 99px;
+            }
+            .stock-badge.out { background: #fde8e4; color: #a3341f; }
+            .stock-badge.low { background: #fef3cd; color: #7a5800; }
+            .stock-badge.ok  { background: #e8f0e9; color: var(--accent-ink); }
+
+            .col-actions a {
+                color: var(--accent-ink);
+                text-decoration: none;
+                padding: 5px 8px;
+                border-radius: 6px;
+            }
+            .col-actions a:hover { background: var(--shelf); }
+
+            .btn-delete {
+                background: none;
+                border: none;
+                color: #a3341f;
+                cursor: pointer;
+                font-size: inherit;
+                padding: 5px 8px;
+                border-radius: 6px;
+            }
+            .btn-delete:hover { background: #fde8e4; }
+            .col-actions form { display: inline; }
+
+            .empty, .no-results {
+                padding: 48px 16px;
+                text-align: center;
+                color: var(--ink-soft);
+            }
+            .empty p { margin: 0 0 16px; }
+
+            .button {
+                display: inline-block;
+                background: var(--accent);
+                color: #fff;
+                text-decoration: none;
+                font-weight: 600;
+                padding: 10px 18px;
+                border-radius: 8px;
+                font-size: 1rem;
+                border: none;
+                cursor: pointer;
+            }
+            .button:hover { background: var(--accent-ink); }
+
+            @media (max-width: 600px) {
+                thead { display: none; }
+                tbody tr { display: block; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+                tbody td { display: flex; justify-content: space-between; border: none; padding: 4px 0; }
+                tbody td::before { content: attr(data-label); color: var(--ink-soft); font-size: 0.82rem; }
+                .col-num, .col-actions { text-align: right; }
+                .col-id { width: auto; }
+            }
+        </style>
         {% endblock %}
 
         {% block javascripts %}
@@ -19,6 +171,8 @@
         {% endif %}
     </head>
     <body>
-        {% block body %}{% endblock %}
+        <div class="page">
+            {% block body %}{% endblock %}
+        </div>
     </body>
 </html>
